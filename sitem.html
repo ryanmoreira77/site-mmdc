@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Central M - Todas as notícias sobre o MMDC em um só lugar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Paleta: branco + preto + vermelho */
+        :root{
+            --primary:#000000; /* preto */
+            --accent:#cc0000;  /* vermelho */
+            --muted:#f5f5f5;   /* branco levemente acinzentado */
+        }
+        body { background: var(--muted); color: var(--primary); }
+        header, nav, footer { background: #ffffff; }
+        .accent { color: var(--accent); }
+        .btn-accent { background: var(--accent); color: #fff; }
+        .btn-accent:hover { background: #a80000; }
+        .news-card:hover .news-image { transform: scale(1.04); }
+        .news-image { transition: transform .3s ease; }
+        .category-tab.active { border-bottom: 3px solid var(--accent); color: var(--accent); font-weight:600; }
+        .breaking-news-ticker{ animation: scroll 25s linear infinite; white-space:nowrap; }
+        @keyframes scroll { 0%{transform:translateX(100%);}100%{transform:translateX(-100%);} }
+
+        /* Seções com fade-in/out suaves */
+        section.fade { opacity:0; transform:translateY(10px); transition:opacity .45s ease, transform .45s ease; }
+        section.fade.active { opacity:1; transform:translateY(0); }
+
+        /* Layout maior */
+        .container-wide { max-width:1200px; }
+
+        /* Card details */
+        .card-meta { font-size:.85rem; color:#6b7280; }
+
+        /* Sidebar stick */
+        .sidebar { position: sticky; top:1.75rem; }
+
+        /* Responsiveness small tweaks */
+        @media (max-width:768px){
+            .container-wide{padding-left:1rem;padding-right:1rem;}
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Header -->
+    <header class="shadow-sm">
+        <div class="container container-wide mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-black text-white text-lg font-bold">M</div>
+                <div>
+                    <h1 class="text-2xl font-extrabold" style="letter-spacing:0.2px;">Central M</h1>
+                    <p class="text-sm text-gray-600">Todas as notícias sobre o MMDC em um só lugar</p>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 relative">
+                <input id="search" type="text" placeholder="Buscar notícias..." class="w-full border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-red-600">
+                <button aria-label="buscar" class="absolute right-2 top-2 text-gray-600"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="text-gray-700"><i class="fas fa-bell"></i></button>
+                <button class="text-gray-700"><i class="fas fa-user"></i></button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="border-t border-gray-200">
+            <div class="container container-wide mx-auto px-4">
+                <div class="flex items-center justify-between overflow-x-auto py-3">
+                    <div class="flex space-x-6">
+                        <button class="category-tab active px-2 py-1 text-sm">Início</button>
+                        <button class="category-tab px-2 py-1 text-sm">Escola</button>
+                        <button class="category-tab px-2 py-1 text-sm">Diretoria</button>
+                        <button class="category-tab px-2 py-1 text-sm">Curso ADM</button>
+                        <button class="category-tab px-2 py-1 text-sm">Curso D.S</button>
+                        <button class="category-tab px-2 py-1 text-sm">Curso Farmácia</button>
+                        <button class="category-tab px-2 py-1 text-sm">Vídeos</button>
+                        <button class="category-tab px-2 py-1 text-sm">Mais Lidas</button>
+                    </div>
+                    <div class="text-sm text-gray-500 hidden md:block">Última atualização: <span id="updated-date">há poucos instantes</span></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breaking News Ticker -->
+    <div class="bg-black text-white py-2">
+        <div class="container container-wide mx-auto px-4">
+            <div class="flex items-center gap-4">
+                <span class="font-bold mr-4">ÚLTIMA HORA:</span>
+                <div class="breaking-news-ticker">
+                    <span class="mx-6">Visita a faculdade São Judas impressiona alunos com seu campus.</span>
+                    <span class="mx-6">3A segue na liderença do brasileirão SAEB!</span>
+                    <span class="mx-6">Prepare-se, a semana de provas irá começae!</span>
+                    <span class="mx-6">Diretora revela que semana de aulas online se iniciará em breve devido o provão paulista.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Area -->
+    <main class="container container-wide mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left / Main Column (9/12) -->
+        <div class="lg:col-span-8 space-y-8">
+            <!-- Featured large article -->
+            <section id="section-inicio" class="fade active bg-white rounded-xl shadow p-6">
+                <div class="md:flex gap-6">
+                    <div class="md:w-2/3">
+                        <div class="h-64 bg-gray-200 w-full rounded-lg overflow-hidden flex items-center justify-center">
+                            <!-- Placeholder image - trocar depois -->
+                            <span class="text-gray-500">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWFvYon_0Zuao20F21-5AM17r-gTe3CsfQXA&s">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="md:w-1/3 flex flex-col justify-between">
+                        <div>
+                            <span class="inline-block text-xs font-semibold px-2 py-1 bg-red-100 text-red-700 rounded">DESTAQUE</span>
+                            <h2 class="text-2xl font-bold mt-3">A prova do SAEB para os terceiros e Nonos anos começa na próxima semana!</h2>
+                            <p class="text-gray-700 mt-2">A diretora já deus as devidas instruções aos alunos que irão realizar a prova, caneta preta transparente e RG.</p>
+                        </div>
+                        <!--Colocar a setinha para o lado direito aqui, dando função de rolar para outra noticia-->
+                        <div class="carrossel-container">
+    
+    <button class="botao-navegacao anterior" onclick="noticiaAnterior()">
+        
+    </button>
+    
+    <button class="botao-navegacao proxima" onclick="proximaNoticia()">
+        >
+    </button>
+
+    <div class="noticias-wrapper" id="meuCarrossel">
+        <div class="noticia">... Notícia 1 ...</div>
+        <div class="noticia">... Notícia 2 ...</div>
+        <div class="noticia">... Notícia 3 ...</div>
+        </div>
+</div>
+  
+ 
+                        <div class="mt-4 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-sm">CO</div>
+                                <div class="text-sm text-gray-600">Alef Alexandre• <span class="card-meta">há 2 semanas</span></div>
+                            </div>
+                            <button class="btn-accent px-4 py-2 rounded-full">Ler mais</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latest grid -->
+                <div class="mt-6">
+                    <h3 class="text-xl font-bold mb-4">Últimas Notícias</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- 9 cards -->
+                        <article class="bg-white border rounded-xl overflow-hidden shadow-sm news-card">
+                            <div class="h-40 bg-gray-100 news-image flex items-center justify-center"> 
+                                <img src="c:\Users\RYANAUGUSTOMOREIRADA\Downloads\barbearia.png">
+                                </div>
+                            
+                            <div class="p-4">
+                                <h4 class="font-bold">Alunos fazem parceria com Barbearia Marks</h4>
+                                <p class="text-sm text-gray-600 mt-2">Grupo de DS fecha uma parceria com a Barberia Marks</p>
+                                <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                    <span>Curso • 1h</span>
+                                    <button class="text-red-600 font-medium">Ler</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="bg-white border rounded-xl overflow-hidden shadow-sm news-card">
+                            <div class="h-40 bg-gray-100 news-image flex items-center justify-center">
+                               <img src="c:\Users\RYANAUGUSTOMOREIRADA\Downloads\leilao.jpeg">
+                            </div>
+                            <div class="p-4">
+                                <h4 class="font-bold">Alunos do curso de DS terminam um site de leilão online!</h4>
+                                <p class="text-sm text-gray-600 mt-2">Equipe finalizou um site de leilão online.</p>
+                                <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                    <span>Esportes • 3h</span>
+                                    <button class="text-red-600 font-medium">Ler</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="bg-white border rounded-xl overflow-hidden shadow-sm news-card">
+                            <div class="h-40 bg-gray-100 news-image flex items-center justify-center">
+                                <img src="c:\Users\RYANAUGUSTOMOREIRADA\Downloads\basket2.jpeg">
+
+                            </div>
+                            <div class="p-4">
+                                <h4 class="font-bold">Grupo de alunos realizam o desenvolvimento de um aplicativo</h4>
+                                <p class="text-sm text-gray-600 mt-2">Projeto pedagógico traz o desenvolvimento de um aplicativo mobile.</p>
+                                <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                    <span>Educação • 6h</span>
+                                    <button class="text-red-600 font-medium">Ler</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="bg-white border rounded-xl overflow-hidden shadow-sm news-card">
+                            <div class="h-40 bg-gray-100 news-image flex items-center justify-center">
+                             <img src="https://nr.com.br/wp-content/uploads/2021/08/australia-1296727_1280.png"> 
+                            </div>
+                            <div class="p-4">
+                                <h4 class="font-bold">Aluno do 2 ano vai a Austrália por 6 meses </h4>
+                                <p class="text-sm text-gray-600 mt-2">João Castellone do 2 ano conseguiu ir para o país via saresp.</p>
+                                <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                    <span> • 1 dia</span>
+                                    <button class="text-red-600 font-medium">Ler</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="bg-white border rounded-xl overflow-hidden shadow-sm news-card">
+                            <div class="h-40 bg-gray-100 news-image flex items-center justify-center">
+                            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEii05j6eWwzimy_n9pfWL2ui067EDWFW6FIIsxqAavD01sPXxa1pBZDedXihpgmbNBbbQSrVJHjwrTXlBweUIMva82rnIfNVDSmoUJIbOmTZfbHZieVwnkNsM5kAgX1LsONns1dQLA9pM2nzxGCZxMT-0UrloQtLQHuWzx4RMTC3BthTpTGpgZ9ftHHL4Jo/w1600/Equipamento.webp">
+                            </div>
+                            <div class="p-4">
+                                <h4 class="font-bold">Curso de farmácia recebe materiais</h4>
+                                <p class="text-sm text-gray-600 mt-2">Curso de Farmácia amplia espaço e práticas laboratoriais com novos equipamentos.</p>
+                                <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                    <span>Saúde • 2 dias</span>
+                                    <button class="text-red-600 font-medium">Ler</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="bg-white border rounded-xl overflow-hidden shadow-sm news-card">
+                            <div class="h-40 bg-gray-100 news-image flex items-center justify-center">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQummZEwkCsJNJ3ESX9G32JY5CSwX5rmXlGCQ&s">
+                            </div>
+                            <div class="p-4">
+                                <h4 class="font-bold">3 ano de DS vai a bolsa de valores (B3)</h4>
+                                <p class="text-sm text-gray-600 mt-2">Profissionais do mercado apresentam a bolsa de valores e suas estruturas aos alunos.</p>
+                                <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                    <span>Carreiras • 2 meses </span>
+                                    <button class="text-red-600 font-medium">Ler</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        
+                </div>
+            </section>
+
+            <!-- Videos section (thumbnail grid) -->
+            <section id="section-videos" class="fade hidden bg-white rounded-xl shadow p-6">
+                <h3 class="text-xl font-bold mb-4">Vídeos Recentes</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-100 rounded overflow-hidden">
+                        <div class="h-44 bg-black flex items-center justify-center text-white">
+                        <img src="https://i.ytimg.com/vi/9AewqEOO1gw/maxresdefault.jpg">
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-semibold">Band Esportes Clube, matéria do Haakin </h4>
+                            <p class="text-xs text-gray-600 mt-2">2:45 • há 4 meses</p>
+                        </div>
+                    </div>
+                    
+            </section>
+
+            <!-- More Lidas (full page) -->
+            <section id="section-mais-lidas" class="fade hidden bg-white rounded-xl shadow p-6">
+                <h3 class="text-xl font-bold mb-4">Mais Lidas
+                <ol class="space-y-4">
+                    <li class="flex items-start gap-4">
+                        <div class="text-2xl font-bold text-gray-300">1</div>
+                        <div>
+                            <h4 class="font-bold">A prova SAEB para os terceiros e Nonos anos começa na próxima semana!</h4>
+                            <p class="text-sm text-gray-600 mt-1">Fique atento as intruções na hora na prova.
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="text-2xl font-bold text-gray-300">2</div>
+                        <div>
+                            <h4 class="font-bold"></h4>
+                            <p class="text-sm text-gray-600 mt-1">Datas do Provão Paulista já foram reveladas, veja já!</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="text-2xl font-bold text-gray-300">3</div>
+                        <div>
+                            <h4 class="font-bold">Influencer conhecido como DunkBoy visita nossa escola.</h4>
+                            <p class="text-sm text-gray-600 mt-1">Hakkin e DK fazem uma visita e alegra os nossos alunos.
+                        </div>
+                    </li>
+                </ol>
+            </section>
+
+            <!-- Course detailed pages -->
+            <section id="section-curso-adm" class="fade hidden bg-white rounded-xl shadow p-6">
+                <h3 class="text-2xl font-bold mb-2">Curso de Administração</h3>
+                <p class="text-gray-700 mb-4">O curso de Administração prepara profissionais para gestão, finanças e empreendedorismo. Estrutura com aulas práticas, projetos e parcerias com empresas locais.</p>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <article class="bg-white border p-4 rounded shadow-sm">
+                        <h4 class="font-bold">Workshop de finanças pessoais</h4>
+                        <p class="text-sm text-gray-600 mt-2">Atividade prática com simuladores de orçamento.</p>
+                    </article>
+                    <article class="bg-white border p-4 rounded shadow-sm">
+                        <h4 class="font-bold">Parceria com incubadora</h4>
+                        <p class="text-sm text-gray-600 mt-2">Mentorias e mentorias para projetos dos alunos.</p>
+                    </article>
+                    <article class="bg-white border p-4 rounded shadow-sm">
+                        <h4 class="font-bold">Visitas técnicas</h4>
+                        <p class="text-sm text-gray-600 mt-2">Empresas locais abrem suas portas para os estudantes.</p>
+                    </article>
+                </div>
+            </section>
+
+                    <!-- Cursos Section -->
+        <section id="cursos" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-12">Nossos Cursos Técnicos</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Farmácia -->
+                <div class="curso-card bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-48 bg-red-100 flex items-center justify-center">
+                        <i data-feather="activity" class="w-16 h-16 text-red-600"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-red-600 mb-3">Técnico em Farmácia</h3>
+                        <p class="text-gray-600 mb-4">Formação completa para atuar em drogarias, farmácias hospitalares e indústrias farmacêuticas.</p>
+                        <ul class="space-y-2 mb-4">
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Duração: 24 meses</li>
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Estágio supervisionado</li>
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Certificação reconhecida</li>
+                        </ul>
+                        <button class="w-full bg-red-100 text-red-600 py-2 rounded-lg font-medium hover:bg-red-200 transition">Saiba mais</button>
+                    </div>
+                </div>
+
+                <!-- Desenvolvimento de Sistemas -->
+                <div class="curso-card bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-48 bg-blue-100 flex items-center justify-center">
+                        <i data-feather="code" class="w-16 h-16 text-blue-600"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-blue-600 mb-3">Técnico em Desenvolvimento de Sistemas</h3>
+                        <p class="text-gray-600 mb-4">Aprenda a desenvolver aplicativos, sistemas web e mobile com as tecnologias mais atuais.</p>
+                        <ul class="space-y-2 mb-4">
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Duração: 24 meses</li>
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Projetos práticos</li>
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Portfólio profissional</li>
+                        </ul>
+                        <button class="w-full bg-blue-100 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-200 transition">Saiba mais</button>
+                    </div>
+                </div>
+
+                <!-- Administração -->
+                <div class="curso-card bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-48 bg-green-100 flex items-center justify-center">
+                        <i data-feather="briefcase" class="w-16 h-16 text-green-600"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-green-600 mb-3">Técnico em Administração</h3>
+                        <p class="text-gray-600 mb-4">Formação completa para gestão empresarial, recursos humanos e processos administrativos.</p>
+                        <ul class="space-y-2 mb-4">
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Duração: 24 meses</li>
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Certificação nacional</li>
+                            <li class="flex items-center"><i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i> Mercado em alta</li>
+                        </ul>
+                        <button class="w-full bg-green-100 text-green-600 py-2 rounded-lg font-medium hover:bg-green-200 transition">Saiba mais</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+            <section id="section-curso-ds" class="fade hidden bg-white rounded-xl shadow p-6">
+                <h3 class="text-2xl font-bold mb-2">Curso de Desenvolvimento de Sistemas</h3>
+                <p class="text-gray-700 mb-4">Foco em desenvolvimento web, mobile e metodologias ágeis. O curso combina teoria com prática em projetos reais, hackathons e estágios.</p>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <article class="bg-white border p-4 rounded shadow-sm">
+                        <h4 class="font-bold">Projeto de aplicativo escolar</h4>
+                        <p class="text-sm text-gray-600 mt-2">Equipe criou app para organizar eventos e tarefas.</p>
+                    </article>
+                    <article class="bg-white border p-4 rounded shadow-sm">
+                        <h4 class="font-bold">Semana da tecnologia</h4>
+                        <p class="text-sm text-gray-600 mt-2">Palestras, oficinas e mentorias com profissionais do mercado.</p>
+                    </article>
+                    <article class="bg-white border p-4 rounded shadow-sm">
+                        <h4 class="font-bold">Hackathon interno</h4>
+                        <p class="text-sm text-gray-600 mt-2">Maratona de programação com premiações.</p>
+                    </article>
+                </div>
+
+                <h4 class="font-semibold mb-2">Notícias do curso</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 border rounded">
+                        <h5 class="font-bold">Equipe classificada para a final regional</h5>
+                        <p class="text-sm text-gray-600 mt-1">Projeto de IA ganhou destaque por proposta inovadora.</p>
+                    </div>
+                    <div class="p-4 border rounded">
+                        <h5 class="font-bold">Nova sala de servidores instalada</h5>
+                        <p class="text-sm text-gray-600 mt-1">Infraestrutura atualizada para práticas avançadas.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-curso-farmacia" class="fade hidden bg-white rounded-xl shadow p-6">
+                <h3 class="text-2xl font-bold mb-2">Curso de Farmácia</h3>
+                <p class="text-gray-700 mb-4">Formação técnica e prática em análises clínicas, farmácia comunitária e pesquisa farmacêutica. Muitas atividades práticas em laboratório e parcerias com a rede de saúde.</p>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <article class="border p-4 rounded">
+                        <h4 class="font-bold">Projeto sobre uso racional de medicamentos</h4>
+                        <p class="text-sm text-gray-600 mt-1">Campanha de conscientização para alunos e comunidade.</p>
+                    </article>
+                    <article class="border p-4 rounded">
+                        <h4 class="font-bold">Modernização do laboratório</h4>
+                        <p class="text-sm text-gray-600 mt-1">Novos equipamentos para análises e práticas.</p>
+                    </article>
+                    <article class="border p-4 rounded">
+                        <h4 class="font-bold">Campanha de saúde</h4>
+                        <p class="text-sm text-gray-600 mt-1">Ações preventivas com aferição de pressão e orientações.</p>
+                    </article>
+                </div>
+
+                <h4 class="font-semibold mb-2">Notícias do curso</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 border rounded">
+                        <h5 class="font-bold">Estágio em rede hospitalar fortalecido</h5>
+                        <p class="text-sm text-gray-600 mt-1">Mais vagas para alunos avançados.</p>
+                    </div>
+                    <div class="p-4 border rounded">
+                        <h5 class="font-bold">Publicação de artigo em revista acadêmica</h5>
+                        <p class="text-sm text-gray-600 mt-1">Pesquisa desenvolvida por docentes e alunos.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right / Sidebar Column (4/12) -->
+        <aside class="lg:col-span-4">
+            <div class="sidebar space-y-6">
+                <!-- Search box (mobile duplicate) -->
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <h4 class="font-bold mb-2">Pesquisar</h4>
+                    <input type="text" placeholder="Pesquisar artigos..." class="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-red-600">
+                </div>
+
+                <!-- Most read -->
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <h4 class="font-bold mb-3">Mais Recentes</h4>
+                    <ul class="space-y-3 text-sm text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">1</div>
+                            <div>
+                                <div class="font-semibold">Novos Equipamentos para os cursos técnicos: MMDC</div>
+                                
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">2</div>
+                            <div>
+                                <div class="font-semibold">Desenvolvimento de Sistemas: Novos computadores para a turma</div>
+                                
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">3</div>
+                            <div>
+                                <div class="font-semibold">Novo professor coordenador para o Curso de ADM</div>
+                               
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                
+                <!-- Quick links -->
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <h4 class="font-bold mb-3">Navegação rápida</h4>
+                    <ul class="text-sm space-y-2">
+                        <li><button class="category-tab text-left w-full text-sm">Início</button></li>
+                        <li><button class="category-tab text-left w-full text-sm">Escola</button></li>
+                        <li><button class="category-tab text-left w-full text-sm">Curso D.S</button></li>
+                        <li><button class="category-tab text-left w-full text-sm">Curso Farmácia</button></li>
+                    </ul>
+                </div>
+
+                <!-- Small footer card -->
+                <div class="bg-white rounded-xl p-4 text-xs text-gray-500 shadow-sm">
+                    <div class="font-semibold mb-2">Contato</div>
+                    Rua Cuiabá, 667 - São Paulo/SP<br>
+                    (11) 2601-3986<br>
+                    ryaan.augusto23@gmail.com
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-8">
+        <div class="container container-wide mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <h4 class="font-bold text-lg">Central da Informação</h4>
+                <p class="text-sm text-gray-300 mt-2">Portal de notícias com cobertura escolar, institucional e comunitária.</p>
+            </div>
+            <div>
+                <h4 class="font-bold">Categorias</h4>
+                <ul class="text-sm mt-2 text-gray-300 space-y-1">
+                    <li>Mundo</li>
+                    <li>Curso técnico</li>
+                    <li>Economia</li>
+                    <li>Esportes</li>
+                </ul>
+            </div>
+             <div>
+                <h4 class="font-bold">Desenvolvedores</h4>
+                <ul class="text-sm mt-2 text-gray-300 space-y-1">
+                    <li>Alef Alexandre e Ryan Augusto</li>
+                </ul>
+                <h4 class="font-bold">Instagram</h4>
+                <ul class="text-sm mt-2 text-gray-300 space-y-1">
+                    <li>@alef_novaes90</li>
+                    <li>@moreiraqyz</li>
+                    <li>@e.e.m.m.d.c</li>
+           
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-6 pt-4 text-center text-sm text-gray-400">
+            © 2025 Central da Informação. Todos os direitos reservados.
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Atualiza data (apenas exibido)
+        document.getElementById('updated-date').textContent = new Date().toLocaleString('pt-BR', { hour: '2-digit', minute:'2-digit', day:'2-digit', month:'2-digit', year:'numeric' });
+
+        // Newsletter / sidebar signup handlers (simples)
+        document.querySelectorAll('.btn-accent, .container .btn-accent').forEach(btn => {
+            btn.addEventListener('click', () => alert('Obrigado por assinar!'));
+        });
+        document.querySelectorAll('input[type="email"]').forEach(input => {
+            input.addEventListener('keydown', e => {
+                if(e.key === 'Enter') {
+                    const val = e.target.value || '';
+                    if(val.includes('@')) alert('Obrigado por assinar!'); else alert('Insira um email válido.');
+                }
+            });
+        });
+
+        // Helper: normalize tab text -> id-safe slug
+        function slugFromTabText(text){
+            return text.trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g,'') // remove acentos
+                .replace(/\./g,'') // remove pontos
+                .replace(/\s+/g,'-')
+                .replace(/[^a-z0-9\-]/g,''); // remove chars extras
+        }
+
+        // Tabs behavior (fade-out + fade-in)
+        const tabs = document.querySelectorAll('.category-tab');
+        const sections = Array.from(document.querySelectorAll('main section.fade'));
+
+        function hideAllSections(){
+            sections.forEach(sec => {
+                sec.classList.remove('active');
+                // after transition, hide for accessibility
+                setTimeout(() => sec.classList.add('hidden'), 500);
+            });
+        }
+
+        function showSectionById(id){
+            const sec = document.getElementById(id);
+            if(!sec) return false;
+            // ensure hidden removed then add active
+            sec.classList.remove('hidden');
+            setTimeout(() => sec.classList.add('active'), 50);
+            return true;
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                // remove active on all tabs UI
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // compute id
+                const slug = slugFromTabText(tab.textContent || tab.innerText);
+                const targetId = 'section-' + slug;
+
+                // hide current sections gracefully
+                hideAllSections();
+
+                // show target or fallback to inicio
+                setTimeout(() => {
+                    if(!showSectionById(targetId)) {
+                        showSectionById('section-inicio');
+                    }
+                }, 500); // wait fade-out to show fade-in
+            });
+        });
+
+        // Also support quick links in sidebar (they are .category-tab too)
+        document.querySelectorAll('.sidebar .category-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // trigger click on matching top menu tab
+                const text = btn.textContent.trim();
+                const top = Array.from(document.querySelectorAll('nav .category-tab')).find(t => t.textContent.trim() === text);
+                if(top) top.click();
+            });
+        });
+
+        // Prevent accidental gestures on thumbnails (demo)
+        document.querySelectorAll('.news-card button').forEach(b => b.addEventListener('click', e => e.stopPropagation()));
+    </script>
+</body>
+</html>
